@@ -10,13 +10,13 @@ const SOS = ({ setPage }) => {
   const [locationError, setLocationError] = useState("");
   const [emergencyContacts, setEmergencyContacts] = useState([]);
   const [message, setMessage] = useState("I need immediate help!");
+  const [sosResult, setSosResult] = useState(null); // stores { telegramSent, telegramFailed }
 
   useEffect(() => {
     if (!isLoggedIn()) {
       setPage("login");
       return;
     }
-    
     getLocation();
     loadEmergencyContacts();
   }, [setPage]);
@@ -55,32 +55,28 @@ const SOS = ({ setPage }) => {
       return;
     }
 
+    if (emergencyContacts.length === 0) {
+      setError("No emergency contacts found. Please add contacts in your Profile.");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
     try {
-      await sosAPI.sendSOS({
+      // This hits POST /api/sos on your backend
+      // Backend fetches contacts from DB, sends Telegram alerts, and returns result
+      const result = await sosAPI.sendSOS({
         lat: location.lat,
         lng: location.lng,
         message
       });
 
+      setSosResult(result); // save telegramSent / telegramFailed counts
       setSent(true);
 
-      // Open SMS for each emergency contact using Formspree
-      // Since Formspree needs a form ID, we'll use the SMS: protocol as fallback
-      const mapsUrl = `https://www.google.com/maps?q=${location.lat},${location.lng}`;
-      const sosMessage = `🚨 EMERGENCY SOS!\n\n${message}\n\nMy Location: ${mapsUrl}`;
-
-      // Try to open SMS for each contact
-      for (const contact of emergencyContacts) {
-        const phone = contact.phone.replace(/\D/g, "");
-        const smsUrl = `sms:${phone}?body=${encodeURIComponent(sosMessage)}`;
-        window.open(smsUrl, "_blank");
-      }
-
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to send SOS. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -88,6 +84,7 @@ const SOS = ({ setPage }) => {
 
   const resetSOS = () => {
     setSent(false);
+    setSosResult(null);
     setError("");
     getLocation();
   };
@@ -115,11 +112,32 @@ const SOS = ({ setPage }) => {
         )}
 
         {sent ? (
+          /* ── SUCCESS SCREEN ── */
           <div className="text-center">
             <div className="text-6xl mb-4">✅</div>
-            <h2 className="text-2xl font-bold text-green-600 mb-4">SOS Sent Successfully!</h2>
-            <p className="text-gray-600 mb-4">
-              Your emergency contacts have been notified with your location.
+            <h2 className="text-2xl font-bold text-green-600 mb-4">SOS Sent!</h2>
+
+            {/* Show how many Telegram alerts were delivered */}
+            {sosResult && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4 text-left space-y-1">
+                <p className="text-green-700 font-medium">
+                  📨 Telegram alerts sent: {sosResult.telegramSent ?? 0}
+                </p>
+                {sosResult.telegramFailed > 0 && (
+                  <p className="text-orange-600 text-sm">
+                    ⚠️ Failed to reach {sosResult.telegramFailed} contact(s) — check their Chat IDs in Profile.
+                  </p>
+                )}
+                {sosResult.contactsWithoutTelegram > 0 && (
+                  <p className="text-orange-500 text-sm">
+                    ℹ️ {sosResult.contactsWithoutTelegram} contact(s) have no Telegram ID — add them in Profile.
+                  </p>
+                )}
+              </div>
+            )}
+
+            <p className="text-gray-600 mb-6 text-sm">
+              Your emergency contacts were notified with your current location via Telegram.
             </p>
             <button
               onClick={resetSOS}
@@ -133,15 +151,24 @@ const SOS = ({ setPage }) => {
             {/* Location Status */}
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
               <div className="flex items-center gap-3">
-                <div className={`w-4 h-4 rounded-full ${location ? "bg-green-500" : "bg-red-500"}`}></div>
+                <div className={`w-4 h-4 rounded-full ${location ? "bg-green-500" : "bg-yellow-400 animate-pulse"}`}></div>
                 <div>
                   <div className="font-medium">Your Location</div>
                   <div className="text-sm text-gray-500">
-                    {location 
+                    {location
                       ? `Lat: ${location.lat.toFixed(6)}, Lng: ${location.lng.toFixed(6)}`
-                      : "Fetching location..."
-                    }
+                      : "Fetching location..."}
                   </div>
+                  {location && (
+                    <a
+                      href={`https://maps.google.com/?q=${location.lat},${location.lng}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-indigo-500 underline"
+                    >
+                      Preview on Google Maps
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
@@ -150,12 +177,31 @@ const SOS = ({ setPage }) => {
             <div className="bg-white rounded-lg shadow-md p-6 mb-6">
               <h3 className="font-semibold mb-3">Emergency Contacts ({emergencyContacts.length})</h3>
               {emergencyContacts.length === 0 ? (
-                <p className="text-gray-500 text-sm">No emergency contacts set. Add them in your Profile.</p>
+                <p className="text-gray-500 text-sm">
+                  No emergency contacts set.{" "}
+                  <button
+                    onClick={() => setPage("profile")}
+                    className="text-indigo-600 underline"
+                  >
+                    Add them in Profile
+                  </button>
+                </p>
               ) : (
                 <div className="space-y-2">
                   {emergencyContacts.map((contact, index) => (
-                    <div key={index} className="flex justify-between text-sm">
-                      <span>{contact.name}</span>
+                    <div key={index} className="flex justify-between items-start text-sm">
+                      <div>
+                        <span className="font-medium">{contact.name}</span>
+                        {contact.relation && (
+                          <span className="text-gray-400 ml-1">({contact.relation})</span>
+                        )}
+                        <div className="text-xs mt-0.5">
+                          {contact.telegramChatId
+                            ? <span className="text-green-600">✅ Telegram ready</span>
+                            : <span className="text-orange-500">⚠️ No Telegram ID</span>
+                          }
+                        </div>
+                      </div>
                       <span className="text-gray-500">{contact.phone}</span>
                     </div>
                   ))}
@@ -163,7 +209,7 @@ const SOS = ({ setPage }) => {
               )}
             </div>
 
-            {/* Message */}
+            {/* Custom Message */}
             <div className="mb-6">
               <label className="block text-sm font-medium mb-2">Custom Message (optional)</label>
               <textarea
@@ -178,7 +224,7 @@ const SOS = ({ setPage }) => {
             <button
               onClick={handleSOS}
               disabled={loading || !location}
-              className={`w-full py-6 text-xl font-bold rounded-lg shadow-lg transition-all ${
+              className={`w-full py-6 text-xl font-bold rounded-lg shadow-lg transition-all text-white ${
                 loading || !location
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-red-600 hover:bg-red-700 hover:scale-105"
@@ -194,7 +240,7 @@ const SOS = ({ setPage }) => {
             </button>
 
             <p className="text-xs text-gray-500 text-center mt-4">
-              This will send your location to all emergency contacts via SMS
+              This will send your live location to all emergency contacts via Telegram
             </p>
           </>
         )}

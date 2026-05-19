@@ -20,8 +20,13 @@ const Profile = ({ setPage }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showPwdModal, setShowPwdModal] = useState(false);
   
-  // State for contact form
-  const [newContact, setNewContact] = useState({ name: "", phone: "", relation: "" });
+  // State for contact form — includes telegramChatId
+  const [newContact, setNewContact] = useState({ 
+    name: "", 
+    phone: "", 
+    relation: "",
+    telegramChatId: ""
+  });
   
   // State for SOS
   const [sosCmd, setSosCmd] = useState("");
@@ -46,7 +51,6 @@ const Profile = ({ setPage }) => {
       setPage("login");
       return;
     }
-    
     loadProfile();
   }, [setPage]);
 
@@ -87,7 +91,8 @@ const Profile = ({ setPage }) => {
     try {
       await userAPI.updateProfile({ emergencyContacts: updatedContacts });
       setEmergencyContacts(updatedContacts);
-      setNewContact({ name: "", phone: "", relation: "" });
+      setNewContact({ name: "", phone: "", relation: "", telegramChatId: "" });
+      setShowECModal(false);
     } catch (err) {
       setError(err.message);
     }
@@ -144,7 +149,6 @@ const Profile = ({ setPage }) => {
       
       setSosHeard(transcript);
       
-      // Check if spoken text contains the saved command
       if (sosCmd && transcript.toLowerCase().includes(sosCmd.toLowerCase())) {
         triggerSOS();
       }
@@ -166,10 +170,8 @@ const Profile = ({ setPage }) => {
   };
 
   const triggerSOS = () => {
-    // Play alarm sound
     const audio = new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU");
     audio.play().catch(() => {});
-    
     alert("🚨 SOS TRIGGERED! Emergency contacts will be notified.");
     setStatus("SOS Triggered!");
   };
@@ -266,7 +268,15 @@ const Profile = ({ setPage }) => {
               <div key={contact.id || contact._id} className="flex items-center justify-between p-3 bg-slate-50 rounded">
                 <div>
                   <div className="font-medium">{contact.name}</div>
-                  <div className="text-sm text-slate-500">{contact.phone} {contact.relation && `(${contact.relation})`}</div>
+                  <div className="text-sm text-slate-500">
+                    {contact.phone} {contact.relation && `(${contact.relation})`}
+                  </div>
+                  <div className="text-xs mt-0.5">
+                    {contact.telegramChatId 
+                      ? <span className="text-green-600">✅ Telegram linked</span>
+                      : <span className="text-orange-500">⚠️ No Telegram ID — alerts won't reach this contact</span>
+                    }
+                  </div>
                 </div>
                 <button
                   onClick={() => handleDeleteContact(contact.id || contact._id)}
@@ -323,29 +333,35 @@ const Profile = ({ setPage }) => {
         )}
       </div>
 
-      {/* Emergency Contact Modal */}
+      {/* ── ADD EMERGENCY CONTACT MODAL ── */}
       {showECModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
             <div className="p-6">
               <h3 className="text-lg font-semibold mb-3">Add Emergency Contact</h3>
               <form onSubmit={handleAddContact} className="space-y-3">
+
+                {/* Name */}
                 <input
                   type="text"
-                  placeholder="Name"
+                  placeholder="Name *"
                   value={newContact.name}
                   onChange={(e) => setNewContact({...newContact, name: e.target.value})}
                   className="w-full px-3 py-2 border rounded"
                   required
                 />
+
+                {/* Phone */}
                 <input
                   type="tel"
-                  placeholder="Phone (e.g., +919876543210)"
+                  placeholder="Phone (e.g., +919876543210) *"
                   value={newContact.phone}
                   onChange={(e) => setNewContact({...newContact, phone: e.target.value})}
                   className="w-full px-3 py-2 border rounded"
                   required
                 />
+
+                {/* Relation */}
                 <select
                   value={newContact.relation}
                   onChange={(e) => setNewContact({...newContact, relation: e.target.value})}
@@ -358,10 +374,27 @@ const Profile = ({ setPage }) => {
                   <option value="Friend">Friend</option>
                   <option value="Other">Other</option>
                 </select>
-                <div className="flex justify-end gap-2">
+
+                {/* ── NEW: Telegram Chat ID ── */}
+                <input
+                  type="text"
+                  placeholder="Telegram Chat ID (e.g., 123456789)"
+                  value={newContact.telegramChatId}
+                  onChange={(e) => setNewContact({...newContact, telegramChatId: e.target.value})}
+                  className="w-full px-3 py-2 border rounded"
+                />
+                <p className="text-xs text-slate-400 -mt-1 px-1">
+                  Ask this contact to message your Telegram bot once, then get their Chat ID from:<br/>
+                  <span className="font-mono break-all">api.telegram.org/bot YOUR_TOKEN /getUpdates</span>
+                </p>
+
+                <div className="flex justify-end gap-2 pt-1">
                   <button
                     type="button"
-                    onClick={() => setShowECModal(false)}
+                    onClick={() => {
+                      setShowECModal(false);
+                      setNewContact({ name: "", phone: "", relation: "", telegramChatId: "" });
+                    }}
                     className="px-3 py-2 rounded bg-white border hover:bg-slate-50"
                   >
                     Cancel
