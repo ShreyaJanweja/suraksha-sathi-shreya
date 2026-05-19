@@ -209,12 +209,175 @@ const Home = ({ setPage }) => {
         .ss-cta-bar::after { content:''; position:absolute; bottom:-80px; left:-30px; width:320px; height:320px; border-radius:50%; background:rgba(255,255,255,.04); }
 
         .ss-dot-grid { background-image:radial-gradient(circle,#94A3B8 1px,transparent 1px); background-size:28px 28px; }
+
+        /* ── Responsive layout helpers ── */
+
+        /* Hero two-column grid */
+        .ss-hero-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 60px;
+          align-items: center;
+        }
+
+        /* Why + Stats two-column grid */
+        .ss-why-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 64px;
+          align-items: start;
+        }
+
+        /* Hero button row */
+        .ss-hero-btns {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          margin-bottom: 36px;
+        }
+
+        /* Badge row */
+        .ss-badge-row {
+          display: flex;
+          gap: 24px;
+          flex-wrap: wrap;
+        }
+
+        /* CTA button row */
+        .ss-cta-btns {
+          display: flex;
+          justify-content: center;
+          gap: 14px;
+          flex-wrap: wrap;
+        }
+
+        /* ── Tablet (641px – 1024px) ── */
+        @media (max-width: 1024px) and (min-width: 641px) {
+          .ss-hero-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+          }
+          .ss-why-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+          }
+          .ss-hero-h1 {
+            font-size: 34px !important;
+          }
+        }
+
+        /* ── Mobile (≤ 640px) ── */
+        @media (max-width: 640px) {
+          /* Stack all two-col grids */
+          .ss-hero-grid,
+          .ss-why-grid {
+            grid-template-columns: 1fr !important;
+            gap: 32px !important;
+          }
+
+          /* Section padding */
+          .ss-hero-section {
+            padding: 48px 0 56px !important;
+          }
+          .ss-features-section,
+          .ss-why-section,
+          .ss-testimonials-section {
+            padding: 56px 0 !important;
+          }
+          .ss-cta-section {
+            padding: 48px 16px !important;
+          }
+
+          /* Blobs — scale down so they don't overflow the viewport width */
+          .ss-blob {
+            transform: scale(0.5) !important;
+            animation: none !important;
+          }
+
+          /* Typography */
+          .ss-hero-h1 {
+            font-size: 28px !important;
+            line-height: 1.2 !important;
+            margin-bottom: 14px !important;
+          }
+          .ss-features-h2,
+          .ss-why-h2,
+          .ss-testi-h2 {
+            font-size: 24px !important;
+          }
+          .ss-cta-h2 {
+            font-size: 24px !important;
+          }
+
+          /* Pill */
+          .ss-hero-pill {
+            font-size: 11px;
+            padding: 5px 11px;
+            margin-bottom: 16px;
+          }
+
+          /* Buttons — full width stacked */
+          .ss-hero-btns {
+            flex-direction: column;
+            align-items: stretch;
+            margin-bottom: 28px;
+          }
+          .ss-btn-primary,
+          .ss-btn-secondary {
+            width: 100%;
+            justify-content: center;
+          }
+
+          /* Badge row */
+          .ss-badge-row {
+            gap: 12px;
+          }
+
+          /* Map card — stop float animation, reduce height */
+          .ss-map-card {
+            animation: none !important;
+            border-radius: 16px !important;
+          }
+          .ss-map-inner {
+            height: 210px !important;
+          }
+
+          /* CTA bar */
+          .ss-cta-bar {
+            padding: 36px 20px !important;
+            border-radius: 18px !important;
+          }
+          .ss-cta-btns {
+            flex-direction: column;
+            align-items: center;
+          }
+          .ss-cta-btns button {
+            width: 100%;
+            max-width: 300px;
+          }
+
+          /* Cards */
+          .ss-feature-card { padding: 20px 18px; }
+          .ss-stat-card    { padding: 16px 14px; }
+          .ss-tip-card     { padding: 16px; }
+          .ss-testimonial  { padding: 20px; }
+        }
+
+        /* ── Small phones (≤ 380px) ── */
+        @media (max-width: 380px) {
+          .ss-hero-h1 { font-size: 23px !important; }
+          .ss-features-h2,
+          .ss-why-h2,
+          .ss-testi-h2,
+          .ss-cta-h2  { font-size: 20px !important; }
+          .ss-cta-bar { padding: 28px 14px !important; border-radius: 14px !important; }
+        }
       `}</style>
 
-      <div className="ss-home" style={{ minHeight:"100vh", background:"#F8FAFF" }}>
+      <div className="ss-home" style={{ minHeight:"100vh", background:"#F8FAFF", overflowX:"hidden" }}>
 
         {/* ══ HERO ══ */}
-        <section style={{ position:"relative", overflow:"hidden", padding:"80px 0 96px",
+        <section className="ss-hero-section" style={{ position:"relative", overflow:"hidden", padding:"80px 0 96px",
           background:"linear-gradient(155deg, #EFF6FF 0%, #F0FDF4 45%, #FDF4FF 100%)" }}>
 
           {/* Animated color blobs */}
@@ -225,14 +388,14 @@ const Home = ({ setPage }) => {
           <div className="ss-dot-grid" style={{ position:"absolute", inset:0, opacity:.18, pointerEvents:"none" }}/>
 
           <div style={{ maxWidth:1160, margin:"0 auto", padding:"0 24px", position:"relative", zIndex:1 }}>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:60, alignItems:"center" }}>
+            <div className="ss-hero-grid">
 
               {/* Left */}
               <div style={{ animation:"fadeSlideUp .55s ease both" }}>
                 <div className="ss-hero-pill">
                   <span className="dot"></span> Live Safety Data · 120+ Reports
                 </div>
-                <h1 style={{ fontSize:46, fontWeight:800, lineHeight:1.13, color:"#0F172A", margin:"0 0 20px" }}>
+                <h1 className="ss-hero-h1" style={{ fontSize:46, fontWeight:800, lineHeight:1.13, color:"#0F172A", margin:"0 0 20px" }}>
                   Empowering Everyone with{" "}
                   <span style={{ background:"linear-gradient(90deg,#2563EB,#7C3AED)", WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent" }}>
                     Smart, Safe Routes
@@ -242,7 +405,7 @@ const Home = ({ setPage }) => {
                 <p style={{ fontSize:16, color:"#64748B", lineHeight:1.72, margin:"0 0 34px", maxWidth:480 }}>
                   Find safer paths home using community reports, live safety insights and instant SOS alerts. Built by students — for a safer tomorrow.
                 </p>
-                <div style={{ display:"flex", gap:12, flexWrap:"wrap", marginBottom:36 }}>
+                <div className="ss-hero-btns">
                   <button className="ss-btn-primary" onClick={() => setPage("route")}>
                     <svg viewBox="0 0 20 20" fill="currentColor" style={{width:16,height:16}}>
                       <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd"/>
@@ -256,7 +419,7 @@ const Home = ({ setPage }) => {
                     Report Unsafe Area
                   </button>
                 </div>
-                <div style={{ display:"flex", gap:24, flexWrap:"wrap" }}>
+                <div className="ss-badge-row">
                   {[{dot:"#2563EB",label:"120+ safe reports"},{dot:"#10B981",label:"Designed by women"},{dot:"#F59E0B",label:"Real-time updates"}].map((b) => (
                     <span className="ss-badge" key={b.label}>
                       <span className="ss-badge-dot" style={{background:b.dot}}></span>{b.label}
@@ -279,7 +442,7 @@ const Home = ({ setPage }) => {
                       suraksha-sathi.live
                     </div>
                   </div>
-                  <div style={{ position:"relative", height:290, overflow:"hidden" }}>
+                  <div className="ss-map-inner" style={{ position:"relative", height:290, overflow:"hidden" }}>
                     <img src="https://www.thestatesman.com/wp-content/uploads/2020/04/googl_ED-1024x683.jpg"
                       alt="Interactive Map" style={{ width:"100%", height:"100%", objectFit:"cover" }}/>
                     <div style={{ position:"absolute", inset:0, background:"linear-gradient(to bottom,transparent 55%,rgba(16,185,129,.07))" }}/>
@@ -307,7 +470,7 @@ const Home = ({ setPage }) => {
         </section>
 
         {/* ══ FEATURES ══ */}
-        <section style={{ position:"relative", padding:"88px 0", overflow:"hidden" }}>
+        <section className="ss-features-section" style={{ position:"relative", padding:"88px 0", overflow:"hidden" }}>
           <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,#F0F9FF 0%,#F0FDF4 100%)" }}/>
           <div className="ss-dot-grid" style={{ position:"absolute", inset:0, opacity:.28, pointerEvents:"none" }}/>
           {/* Accent blobs */}
@@ -317,7 +480,7 @@ const Home = ({ setPage }) => {
           <div style={{ maxWidth:1160, margin:"0 auto", padding:"0 24px", position:"relative", zIndex:1 }}>
             <div style={{ textAlign:"center", marginBottom:52 }}>
               <div className="ss-section-label">Features</div>
-              <h2 style={{ fontSize:34, fontWeight:800, color:"#0F172A", margin:"0 0 12px" }}>Everything you need to stay safe</h2>
+              <h2 className="ss-features-h2" style={{ fontSize:34, fontWeight:800, color:"#0F172A", margin:"0 0 12px" }}>Everything you need to stay safe</h2>
               <p style={{ color:"#64748B", fontSize:15, maxWidth:460, margin:"0 auto", lineHeight:1.6 }}>Real-time data, community wisdom, and smart technology — all in one place.</p>
             </div>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))", gap:22 }}>
@@ -333,16 +496,16 @@ const Home = ({ setPage }) => {
         </section>
 
         {/* ══ WHY + STATS ══ */}
-        <section style={{ position:"relative", padding:"88px 0", overflow:"hidden" }}>
+        <section className="ss-why-section" style={{ position:"relative", padding:"88px 0", overflow:"hidden" }}>
           <div style={{ position:"absolute", inset:0, background:"linear-gradient(135deg,#FDF4FF 0%,#EFF6FF 50%,#F0FDF4 100%)" }}/>
           <div className="ss-blob" style={{ width:380, height:380, background:"radial-gradient(circle,rgba(167,243,208,.42) 0%,transparent 70%)", top:-90, right:60, animation:"blob1 13s ease-in-out infinite" }}/>
           <div className="ss-blob" style={{ width:300, height:300, background:"radial-gradient(circle,rgba(216,180,254,.38) 0%,transparent 70%)", bottom:-50, left:50, animation:"blob2 15s ease-in-out infinite" }}/>
 
           <div style={{ maxWidth:1160, margin:"0 auto", padding:"0 24px", position:"relative", zIndex:1 }}>
-            <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:64, alignItems:"start" }}>
+            <div className="ss-why-grid">
               <div>
                 <div className="ss-section-label">Our Mission</div>
-                <h2 style={{ fontSize:32, fontWeight:800, color:"#0F172A", margin:"0 0 16px" }}>Why Safety Matters</h2>
+                <h2 className="ss-why-h2" style={{ fontSize:32, fontWeight:800, color:"#0F172A", margin:"0 0 16px" }}>Why Safety Matters</h2>
                 <p style={{ fontSize:15, color:"#64748B", lineHeight:1.75, margin:"0 0 32px" }}>
                   Everyone deserves to move freely without fear. Suraksha Sathi is built by students who believe technology can make our streets safer — one route at a time.
                 </p>
@@ -399,7 +562,7 @@ const Home = ({ setPage }) => {
         </section>
 
         {/* ══ TESTIMONIALS ══ */}
-        <section style={{ position:"relative", padding:"88px 0", overflow:"hidden" }}>
+        <section className="ss-testimonials-section" style={{ position:"relative", padding:"88px 0", overflow:"hidden" }}>
           <div style={{ position:"absolute", inset:0, background:"linear-gradient(180deg,#EFF6FF 0%,#F8FAFF 100%)" }}/>
           <div className="ss-dot-grid" style={{ position:"absolute", inset:0, opacity:.22, pointerEvents:"none" }}/>
           <div className="ss-blob" style={{ width:260, height:260, background:"radial-gradient(circle,rgba(147,197,253,.3) 0%,transparent 70%)", bottom:-30, right:80, animation:"blob3 13s ease-in-out infinite" }}/>
@@ -407,7 +570,7 @@ const Home = ({ setPage }) => {
           <div style={{ maxWidth:1160, margin:"0 auto", padding:"0 24px", position:"relative", zIndex:1 }}>
             <div style={{ textAlign:"center", marginBottom:52 }}>
               <div className="ss-section-label">Testimonials</div>
-              <h2 style={{ fontSize:32, fontWeight:800, color:"#0F172A", margin:0 }}>Trusted by our community</h2>
+              <h2 className="ss-testi-h2" style={{ fontSize:32, fontWeight:800, color:"#0F172A", margin:0 }}>Trusted by our community</h2>
             </div>
             <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))", gap:22 }}>
               {testimonials.map((t) => (
@@ -436,17 +599,17 @@ const Home = ({ setPage }) => {
         </section>
 
         {/* ══ CTA ══ */}
-        <section style={{ padding:"80px 24px", background:"#F8FAFF" }}>
+        <section className="ss-cta-section" style={{ padding:"80px 24px", background:"#F8FAFF" }}>
           <div style={{ maxWidth:860, margin:"0 auto" }}>
             <div className="ss-cta-bar">
               <div style={{ position:"relative", zIndex:1 }}>
-                <h2 style={{ fontSize:34, fontWeight:800, color:"white", margin:"0 0 12px", fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
+                <h2 className="ss-cta-h2" style={{ fontSize:34, fontWeight:800, color:"white", margin:"0 0 12px", fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
                   Your safety journey starts here.
                 </h2>
                 <p style={{ color:"rgba(255,255,255,.78)", fontSize:15, margin:"0 0 34px", lineHeight:1.6 }}>
                   Join thousands using Suraksha Sathi to navigate safely every day.
                 </p>
-                <div style={{ display:"flex", justifyContent:"center", gap:14, flexWrap:"wrap" }}>
+                <div className="ss-cta-btns">
                   <button onClick={() => setPage("route")}
                     style={{ background:"white", color:"#1D4ED8", padding:"13px 30px", borderRadius:12, fontWeight:700, fontSize:14, border:"none", cursor:"pointer", boxShadow:"0 4px 18px rgba(0,0,0,.18)", transition:"all .2s" }}
                     onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 8px 24px rgba(0,0,0,.22)"; }}
