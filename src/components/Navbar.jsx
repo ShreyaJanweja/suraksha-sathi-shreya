@@ -34,6 +34,8 @@ const Navbar = ({ setPage, onLogout }) => {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap');
 
+        * { box-sizing: border-box; }
+
         .ss-nav {
           position: sticky; top: 0; z-index: 50;
           font-family: 'DM Sans', sans-serif;
@@ -41,6 +43,8 @@ const Navbar = ({ setPage, onLogout }) => {
           background: linear-gradient(135deg, #1a237e 0%, #1e3a8a 40%, #1d4ed8 100%);
           border-bottom: 1px solid rgba(255,255,255,0.1);
           transition: box-shadow 0.3s ease;
+          width: 100%;
+          overflow-x: hidden;
         }
         .ss-nav.scrolled {
           box-shadow: 0 4px 32px rgba(29,78,216,0.45);
@@ -61,37 +65,78 @@ const Navbar = ({ setPage, onLogout }) => {
           background: radial-gradient(ellipse at 70% 50%, rgba(124,58,237,0.18) 0%, transparent 60%);
         }
 
+        .ss-nav-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 clamp(12px, 4vw, 24px);
+          position: relative;
+          z-index: 1;
+        }
+
+        .ss-nav-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: clamp(56px, 8vw, 64px);
+          gap: 8px;
+        }
+
+        /* Logo */
+        .ss-logo-wrap {
+          display: flex; align-items: center; gap: 10px; cursor: pointer;
+          min-width: 0;
+          flex-shrink: 1;
+        }
         .ss-logo-mark {
-          width: 36px; height: 36px; border-radius: 11px;
+          width: clamp(32px, 6vw, 36px); height: clamp(32px, 6vw, 36px);
+          border-radius: 11px;
           background: rgba(255,255,255,0.15);
           border: 1px solid rgba(255,255,255,0.25);
           display: flex; align-items: center; justify-content: center;
-          font-size: 18px; flex-shrink: 0;
+          font-size: clamp(15px, 3vw, 18px); flex-shrink: 0;
           backdrop-filter: blur(8px);
         }
+        .ss-logo-text-wrap { min-width: 0; }
         .ss-logo-text {
           font-family: 'Plus Jakarta Sans', sans-serif;
-          font-weight: 800; font-size: 16px; color: white; line-height: 1.15;
+          font-weight: 800; font-size: clamp(13px, 3vw, 16px); color: white; line-height: 1.15;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .ss-logo-sub { font-size: 10px; color: rgba(255,255,255,0.5); font-weight: 500; letter-spacing: 0.01em; }
+        .ss-logo-sub {
+          font-size: 10px; color: rgba(255,255,255,0.5); font-weight: 500; letter-spacing: 0.01em;
+          white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
 
+        /* Desktop nav links */
+        .ss-desktop-nav {
+          display: flex; align-items: center; gap: 2px;
+          flex-wrap: wrap;
+        }
         .ss-nav-link {
-          font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.75);
-          padding: 6px 14px; border-radius: 8px; cursor: pointer;
+          font-size: clamp(12px, 1.2vw, 14px); font-weight: 500; color: rgba(255,255,255,0.75);
+          padding: 6px clamp(8px, 1.5vw, 14px); border-radius: 8px; cursor: pointer;
           border: none; background: transparent; transition: all 0.18s;
           white-space: nowrap; font-family: 'DM Sans', sans-serif;
           position: relative; z-index: 1;
         }
         .ss-nav-link:hover { color: white; background: rgba(255,255,255,0.12); }
 
+        /* Desktop actions */
+        .ss-desktop-actions {
+          display: flex; align-items: center; gap: clamp(4px, 1vw, 8px);
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+
         .ss-sos-btn {
           display: inline-flex; align-items: center; gap: 6px;
           background: #EF4444;
-          color: white; padding: 8px 18px; border-radius: 10px;
-          font-size: 13px; font-weight: 700; border: none; cursor: pointer;
+          color: white; padding: 8px clamp(10px, 1.5vw, 18px); border-radius: 10px;
+          font-size: clamp(12px, 1.2vw, 13px); font-weight: 700; border: none; cursor: pointer;
           transition: all .2s; letter-spacing: .04em;
           box-shadow: 0 3px 12px rgba(239,68,68,.5);
           font-family: 'DM Sans', sans-serif; position: relative; z-index: 1;
+          white-space: nowrap;
         }
         .ss-sos-btn:hover { background: #DC2626; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(239,68,68,.6); }
 
@@ -99,11 +144,12 @@ const Navbar = ({ setPage, onLogout }) => {
           display: inline-flex; align-items: center; gap: 6px;
           background: rgba(255,255,255,0.15);
           border: 1px solid rgba(255,255,255,0.3);
-          color: white; padding: 8px 16px;
-          border-radius: 10px; font-size: 13px; font-weight: 600;
+          color: white; padding: 8px clamp(10px, 1.5vw, 16px);
+          border-radius: 10px; font-size: clamp(12px, 1.2vw, 13px); font-weight: 600;
           cursor: pointer; transition: all .2s;
           font-family: 'DM Sans', sans-serif; position: relative; z-index: 1;
           backdrop-filter: blur(8px);
+          white-space: nowrap;
         }
         .ss-report-btn:hover { background: rgba(255,255,255,0.22); transform: translateY(-1px); }
 
@@ -111,11 +157,15 @@ const Navbar = ({ setPage, onLogout }) => {
           display: inline-flex; align-items: center; gap: 8px;
           background: rgba(255,255,255,0.12);
           border: 1px solid rgba(255,255,255,0.2);
-          color: white; padding: 7px 14px; border-radius: 10px;
-          font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s;
+          color: white; padding: 7px clamp(8px, 1.2vw, 14px); border-radius: 10px;
+          font-size: clamp(12px, 1.2vw, 13px); font-weight: 600; cursor: pointer; transition: all .2s;
           font-family: 'DM Sans', sans-serif; position: relative; z-index: 1;
+          max-width: 160px;
         }
         .ss-profile-btn:hover { background: rgba(255,255,255,0.2); }
+        .ss-profile-name {
+          overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;
+        }
 
         .ss-avatar {
           width: 24px; height: 24px; border-radius: 50%;
@@ -127,9 +177,10 @@ const Navbar = ({ setPage, onLogout }) => {
         .ss-logout-btn {
           display: inline-flex; align-items: center; gap: 6px;
           background: transparent; color: rgba(255,255,255,0.6);
-          padding: 7px 14px; border-radius: 10px; font-size: 13px; font-weight: 600;
+          padding: 7px clamp(8px, 1.2vw, 14px); border-radius: 10px; font-size: clamp(12px, 1.2vw, 13px); font-weight: 600;
           border: 1px solid rgba(255,255,255,0.12); cursor: pointer; transition: all .2s;
           font-family: 'DM Sans', sans-serif; position: relative; z-index: 1;
+          white-space: nowrap;
         }
         .ss-logout-btn:hover { color: #FCA5A5; border-color: rgba(239,68,68,.4); background: rgba(239,68,68,.1); }
 
@@ -137,19 +188,21 @@ const Navbar = ({ setPage, onLogout }) => {
           display: inline-flex; align-items: center;
           background: rgba(255,255,255,0.12);
           border: 1px solid rgba(255,255,255,0.2);
-          color: white; padding: 7px 16px; border-radius: 10px;
-          font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s;
+          color: white; padding: 7px clamp(10px, 1.2vw, 16px); border-radius: 10px;
+          font-size: clamp(12px, 1.2vw, 13px); font-weight: 600; cursor: pointer; transition: all .2s;
           font-family: 'DM Sans', sans-serif; position: relative; z-index: 1;
+          white-space: nowrap;
         }
         .ss-login-btn:hover { background: rgba(255,255,255,0.2); }
 
         .ss-signup-btn {
           display: inline-flex; align-items: center; gap: 5px;
-          background: white; color: #1d4ed8; padding: 7px 16px;
-          border-radius: 10px; font-size: 13px; font-weight: 700;
+          background: white; color: #1d4ed8; padding: 7px clamp(10px, 1.2vw, 16px);
+          border-radius: 10px; font-size: clamp(12px, 1.2vw, 13px); font-weight: 700;
           border: none; cursor: pointer; transition: all .2s;
           box-shadow: 0 2px 10px rgba(0,0,0,.15);
           font-family: 'DM Sans', sans-serif; position: relative; z-index: 1;
+          white-space: nowrap;
         }
         .ss-signup-btn:hover { background: #EFF6FF; transform: translateY(-1px); }
 
@@ -157,13 +210,16 @@ const Navbar = ({ setPage, onLogout }) => {
           width: 1px; height: 24px;
           background: rgba(255,255,255,0.15);
           margin: 0 2px; position: relative; z-index: 1;
+          flex-shrink: 0;
         }
 
         /* Hamburger */
         .ss-hamburger {
-          display: flex; flex-direction: column; gap: 5px; padding: 8px;
+          display: none;
+          flex-direction: column; gap: 5px; padding: 8px;
           background: transparent; border: none; cursor: pointer;
           border-radius: 8px; transition: background .18s; position: relative; z-index: 1;
+          flex-shrink: 0;
         }
         .ss-hamburger:hover { background: rgba(255,255,255,0.1); }
         .ss-hamburger span { display: block; width: 20px; height: 2px; background: rgba(255,255,255,0.8); border-radius: 2px; transition: all .25s; }
@@ -175,7 +231,7 @@ const Navbar = ({ setPage, onLogout }) => {
         .ss-mobile-menu {
           background: linear-gradient(180deg, #1e3a8a 0%, #1d4ed8 100%);
           border-top: 1px solid rgba(255,255,255,0.08);
-          padding: 14px 20px 20px;
+          padding: 14px clamp(12px, 4vw, 24px) 20px;
           animation: mobileSlide .2s ease;
         }
         @keyframes mobileSlide { from{opacity:0;transform:translateY(-6px)} to{opacity:1;transform:translateY(0)} }
@@ -189,26 +245,78 @@ const Navbar = ({ setPage, onLogout }) => {
         }
         .ss-mobile-link:hover { background: rgba(255,255,255,0.1); color: white; }
 
+        .ss-mobile-action-row { display: flex; gap: 8px; }
+        .ss-mobile-action-row > * { flex: 1; justify-content: center; }
+
         /* Modal */
         @keyframes modalPop { from{opacity:0;transform:scale(.95) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
         .ss-modal-card { animation: modalPop .22s ease; }
+        .ss-modal-overlay {
+          position: fixed; inset: 0; z-index: 100;
+          display: flex; align-items: center; justify-content: center;
+          padding: 20px;
+        }
+
+        /* ===========================================================
+           BREAKPOINTS
+           - Desktop nav links + actions shown >= 1025px
+           - Hamburger shown <= 1024px
+        =========================================================== */
+
+        /* Large desktops 1367px+ */
+        @media (min-width: 1367px) {
+          .ss-nav-container { padding: 0 32px; }
+        }
+
+        /* Small laptops / tablets-landscape 1025px - 1366px and the >=1025 default */
+        @media (min-width: 1025px) {
+          .ss-desktop-nav, .ss-desktop-actions { display: flex; }
+          .ss-hamburger { display: none; }
+        }
+
+        /* Tablets and below: 1024px and down -> hamburger menu */
+        @media (max-width: 1024px) {
+          .ss-desktop-nav, .ss-desktop-actions { display: none; }
+          .ss-hamburger { display: flex; }
+        }
+
+        /* Tablets 768px - 1024px */
+        @media (max-width: 1024px) and (min-width: 768px) {
+          .ss-mobile-menu { padding-left: clamp(20px, 5vw, 40px); padding-right: clamp(20px, 5vw, 40px); }
+          .ss-mobile-action-row { max-width: 420px; }
+        }
+
+        /* Large phones 481px - 767px */
+        @media (max-width: 767px) {
+          .ss-logo-sub { display: none; }
+        }
+
+        /* Small phones 320px - 480px */
+        @media (max-width: 480px) {
+          .ss-nav-row { height: 56px; }
+          .ss-logo-mark { width: 32px; height: 32px; font-size: 15px; }
+          .ss-logo-text { font-size: 14px; }
+          .ss-mobile-menu { padding: 12px 12px 16px; }
+          .ss-mobile-action-row { flex-direction: column; }
+          .ss-modal-card { padding: 24px !important; max-width: 100% !important; }
+        }
       `}</style>
 
       <header className={`ss-nav ${scrolled ? "scrolled" : ""}`}>
-        <div style={{ maxWidth: 1200, margin: "0 auto", padding: "0 24px", position: "relative", zIndex: 1 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 64 }}>
+        <div className="ss-nav-container">
+          <div className="ss-nav-row">
 
             {/* Logo */}
-            <div onClick={() => setPage("home")} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+            <div className="ss-logo-wrap" onClick={() => setPage("home")}>
               <div className="ss-logo-mark">🛡️</div>
-              <div>
+              <div className="ss-logo-text-wrap">
                 <div className="ss-logo-text">Suraksha Sathi</div>
                 <div className="ss-logo-sub">Every Journey Deserves Safety</div>
               </div>
             </div>
 
             {/* Desktop Nav */}
-            <nav className="hidden md:flex" style={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <nav className="ss-desktop-nav">
               {navLinks.map((link) => (
                 <button key={link.page} className="ss-nav-link" onClick={() => setPage(link.page)}>
                   {link.label}
@@ -217,7 +325,7 @@ const Navbar = ({ setPage, onLogout }) => {
             </nav>
 
             {/* Right Actions */}
-            <div className="hidden md:flex" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div className="ss-desktop-actions">
               <button className="ss-sos-btn" onClick={() => setPage("sos")}>
                 <svg viewBox="0 0 16 16" fill="currentColor" style={{ width: 12, height: 12 }}>
                   <path d="M8 1a7 7 0 100 14A7 7 0 008 1zm-.75 4a.75.75 0 011.5 0v3.25a.75.75 0 01-1.5 0V5zm.75 7a1 1 0 110-2 1 1 0 010 2z"/>
@@ -240,7 +348,7 @@ const Navbar = ({ setPage, onLogout }) => {
                 <>
                   <button className="ss-profile-btn" onClick={() => setPage("profile")}>
                     <div className="ss-avatar">{(user?.name || "U")[0].toUpperCase()}</div>
-                    {user?.name || "Profile"}
+                    <span className="ss-profile-name">{user?.name || "Profile"}</span>
                   </button>
                   <button className="ss-logout-btn" onClick={handleLogout}>
                     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" style={{ width: 13, height: 13 }}>
@@ -263,7 +371,7 @@ const Navbar = ({ setPage, onLogout }) => {
             </div>
 
             {/* Hamburger */}
-            <button className={`ss-hamburger md:hidden ${menuOpen ? "open" : ""}`} onClick={() => setMenuOpen(!menuOpen)}>
+            <button className={`ss-hamburger ${menuOpen ? "open" : ""}`} onClick={() => setMenuOpen(!menuOpen)}>
               <span/><span/><span/>
             </button>
           </div>
@@ -271,7 +379,7 @@ const Navbar = ({ setPage, onLogout }) => {
 
         {/* Mobile Menu */}
         {menuOpen && (
-          <div className="ss-mobile-menu md:hidden">
+          <div className="ss-mobile-menu">
             <div style={{ display: "flex", flexDirection: "column", gap: 2, marginBottom: 12 }}>
               {navLinks.map((link) => (
                 <button key={link.page} className="ss-mobile-link" onClick={() => { setPage(link.page); setMenuOpen(false); }}>
@@ -280,22 +388,22 @@ const Navbar = ({ setPage, onLogout }) => {
               ))}
             </div>
             <div style={{ borderTop: "1px solid rgba(255,255,255,.1)", paddingTop: 12, display: "flex", flexDirection: "column", gap: 8 }}>
-              <div style={{ display: "flex", gap: 8 }}>
-                <button className="ss-sos-btn" style={{ flex: 1, justifyContent: "center" }} onClick={() => { setPage("sos"); setMenuOpen(false); }}>🚨 SOS</button>
-                <button className="ss-report-btn" style={{ flex: 1, justifyContent: "center" }} onClick={() => { setPage("report"); setMenuOpen(false); }}>⚠️ Report</button>
+              <div className="ss-mobile-action-row">
+                <button className="ss-sos-btn" onClick={() => { setPage("sos"); setMenuOpen(false); }}>🚨 SOS</button>
+                <button className="ss-report-btn" onClick={() => { setPage("report"); setMenuOpen(false); }}>⚠️ Report</button>
               </div>
               {loggedIn ? (
                 <>
-                  <button className="ss-profile-btn" style={{ justifyContent: "center" }} onClick={() => { setPage("profile"); setMenuOpen(false); }}>
+                  <button className="ss-profile-btn" style={{ justifyContent: "center", maxWidth: "100%" }} onClick={() => { setPage("profile"); setMenuOpen(false); }}>
                     <div className="ss-avatar">{(user?.name || "U")[0].toUpperCase()}</div>
-                    {user?.name || "Profile"}
+                    <span className="ss-profile-name" style={{ maxWidth: 200 }}>{user?.name || "Profile"}</span>
                   </button>
                   <button className="ss-logout-btn" style={{ justifyContent: "center" }} onClick={() => { handleLogout(); setMenuOpen(false); }}>Logout</button>
                 </>
               ) : (
-                <div style={{ display: "flex", gap: 8 }}>
-                  <button className="ss-login-btn" style={{ flex: 1, justifyContent: "center" }} onClick={() => { setPage("login"); setMenuOpen(false); }}>Login</button>
-                  <button className="ss-signup-btn" style={{ flex: 1, justifyContent: "center" }} onClick={() => { setPage("signup"); setMenuOpen(false); }}>Sign Up</button>
+                <div className="ss-mobile-action-row">
+                  <button className="ss-login-btn" onClick={() => { setPage("login"); setMenuOpen(false); }}>Login</button>
+                  <button className="ss-signup-btn" onClick={() => { setPage("signup"); setMenuOpen(false); }}>Sign Up</button>
                 </div>
               )}
             </div>
@@ -305,7 +413,7 @@ const Navbar = ({ setPage, onLogout }) => {
 
       {/* Logout Modal */}
       {showLogoutModal && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+        <div className="ss-modal-overlay">
           <div style={{ position: "absolute", inset: 0, background: "rgba(15,23,42,.55)", backdropFilter: "blur(6px)" }} onClick={() => setShowLogoutModal(false)}/>
           <div className="ss-modal-card" style={{ position: "relative", background: "white", borderRadius: 20, padding: 32, width: "100%", maxWidth: 360, boxShadow: "0 24px 80px rgba(0,0,0,.2)", border: "1px solid #F1F5F9" }}>
             <div style={{ width: 50, height: 50, borderRadius: 14, background: "#FFF5F5", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18, fontSize: 24 }}>🚪</div>
