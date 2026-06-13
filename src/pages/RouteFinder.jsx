@@ -286,7 +286,7 @@ const RouteFinder = ({ setPage }) => {
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=DM+Sans:wght@400;500;600&display=swap');
 
         .rf-page * { box-sizing: border-box; }
-        .rf-page { font-family: 'DM Sans', sans-serif; }
+        .rf-page { font-family: 'DM Sans', sans-serif; width: 100%; overflow-x: hidden; }
 
         /* Fix leaflet z-index so it never bleeds over navbar */
         .leaflet-container {
@@ -325,6 +325,7 @@ const RouteFinder = ({ setPage }) => {
           background: white; border-radius: 16px;
           border: 1.5px solid #F1F5F9;
           box-shadow: 0 2px 12px rgba(0,0,0,.05);
+          padding: clamp(14px, 4vw, 20px);
           /* NO overflow:hidden — it clips the suggestion dropdowns */
         }
 
@@ -332,6 +333,7 @@ const RouteFinder = ({ setPage }) => {
         .rf-map-wrapper {
           border-radius: 12px;
           overflow: hidden;
+          height: 460px;
         }
 
         .rf-input {
@@ -349,6 +351,7 @@ const RouteFinder = ({ setPage }) => {
           font-weight: 700; cursor: pointer; transition: all .2s;
           box-shadow: 0 3px 12px rgba(37,99,235,.35); white-space: nowrap;
           font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 7px;
+          justify-content: center;
         }
         .rf-find-btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(37,99,235,.45); }
         .rf-find-btn:disabled { opacity: .55; cursor: not-allowed; }
@@ -398,9 +401,122 @@ const RouteFinder = ({ setPage }) => {
 
         @keyframes spin { to{transform:rotate(360deg)} }
         .spinner { width:16px; height:16px; border:2.5px solid rgba(255,255,255,.3); border-top-color:white; border-radius:50%; animation:spin .7s linear infinite; }
+
+        /* ===========================================================
+           LAYOUT
+        =========================================================== */
+        .rf-page-inner {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: clamp(12px, 3vw, 20px) clamp(12px, 3vw, 20px) clamp(24px, 5vw, 40px);
+          background: #F8FAFF;
+          min-height: calc(100vh - 64px);
+        }
+
+        .rf-layout {
+          display: flex;
+          gap: clamp(12px, 2vw, 20px);
+          align-items: flex-start;
+        }
+
+        .rf-left-col {
+          flex: 1;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 16px;
+        }
+
+        .rf-sidebar {
+          width: 300px;
+          flex-shrink: 0;
+        }
+
+        .rf-search-row {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+        }
+
+        .rf-search-field {
+          flex: 1 1 200px;
+          min-width: 200px;
+        }
+
+        .rf-nav-bar-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .rf-nav-bar-info {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          flex: 1;
+          min-width: 0;
+        }
+
+        .rf-nav-bar-actions {
+          display: flex;
+          gap: 8px;
+          flex-shrink: 0;
+        }
+
+        .rf-route-header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 8px;
+          flex-wrap: wrap;
+          margin-bottom: 10px;
+        }
+
+        .rf-stats-row {
+          display: flex;
+          gap: 16px;
+          flex-wrap: wrap;
+        }
+
+        /* ===========================================================
+           BREAKPOINTS
+        =========================================================== */
+
+        /* Small laptops and up keep 2-column layout with fixed sidebar */
+        @media (min-width: 1025px) {
+          .rf-layout { flex-wrap: nowrap; }
+        }
+
+        /* Tablets and below: stack sidebar under main column */
+        @media (max-width: 1024px) {
+          .rf-layout { flex-direction: column; }
+          .rf-sidebar { width: 100%; }
+          .rf-map-wrapper { height: 380px; }
+        }
+
+        /* Large phones 481px - 767px */
+        @media (max-width: 767px) {
+          .rf-map-wrapper { height: 320px; }
+          .rf-route-header { flex-direction: column; align-items: flex-start; }
+          .rf-stats-row { gap: 10px 16px; }
+        }
+
+        /* Small phones 320px - 480px */
+        @media (max-width: 480px) {
+          .rf-page-inner { min-height: calc(100vh - 56px); }
+          .rf-map-wrapper { height: 260px; }
+          .rf-search-field { flex: 1 1 100%; min-width: 100%; }
+          .rf-find-btn { width: 100%; }
+          .rf-nav-bar-row { flex-direction: column; align-items: stretch; }
+          .rf-nav-bar-info { width: 100%; }
+          .rf-nav-bar-actions { width: 100%; justify-content: stretch; }
+          .rf-nav-bar-actions button { flex: 1; justify-content: center; }
+          .rf-stats-row { flex-direction: column; gap: 8px; }
+        }
       `}</style>
 
-      <div className="rf-page" style={{ maxWidth:1200, margin:"0 auto", padding:"20px 20px 40px", background:"#F8FAFF", minHeight:"calc(100vh - 64px)" }}>
+      <div className="rf-page rf-page-inner">
 
         {/* ── Error / Arrived banners ── */}
         {error && (
@@ -414,24 +530,24 @@ const RouteFinder = ({ setPage }) => {
           </div>
         )}
 
-        <div style={{ display:"flex", gap:20, alignItems:"flex-start", flexWrap:"wrap" }}>
+        <div className="rf-layout">
 
           {/* ══ LEFT COLUMN ══ */}
-          <div style={{ flex:1, minWidth:0, display:"flex", flexDirection:"column", gap:16 }}>
+          <div className="rf-left-col">
 
             {/* ── Search Card ── */}
-            <div className="rf-card" style={{ padding:"20px", position:"relative" }}>
+            <div className="rf-card" style={{ position:"relative" }}>
               <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:16 }}>
-                <div style={{ width:32, height:32, borderRadius:9, background:"linear-gradient(135deg,#EFF6FF,#EEF2FF)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:15 }}>🗺️</div>
+                <div style={{ width:32, height:32, borderRadius:9, background:"linear-gradient(135deg,#EFF6FF,#EEF2FF)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:15, flexShrink:0 }}>🗺️</div>
                 <div>
                   <div style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:15, fontWeight:800, color:"#0F172A" }}>Route Finder</div>
                   <div style={{ fontSize:12, color:"#94A3B8" }}>Find the safest path to your destination</div>
                 </div>
               </div>
 
-              <div style={{ display:"flex", gap:10, flexWrap:"wrap" }}>
+              <div className="rf-search-row">
                 {/* Start input */}
-                <div className="rf-input-wrapper" style={{ flex:1, minWidth:200 }} ref={startInputRef}>
+                <div className="rf-input-wrapper rf-search-field" ref={startInputRef}>
                   <div style={{ position:"relative" }}>
                   <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:15, zIndex:1 }}>🟢</span>
                   <input className="rf-input" type="text" value={startInput} onChange={handleStartInputChange}
@@ -451,7 +567,7 @@ const RouteFinder = ({ setPage }) => {
                 </div>
 
                 {/* End input */}
-                <div className="rf-input-wrapper" style={{ flex:1, minWidth:200 }} ref={endInputRef}>
+                <div className="rf-input-wrapper rf-search-field" ref={endInputRef}>
                   <div style={{ position:"relative" }}>
                   <span style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", fontSize:15, zIndex:1 }}>🔴</span>
                   <input className="rf-input" type="text" value={endInput} onChange={handleEndInputChange}
@@ -479,8 +595,8 @@ const RouteFinder = ({ setPage }) => {
             {/* ── Navigation Bar ── */}
             {routeSteps.length > 0 && !hasArrived && (
               <div className="rf-nav-bar">
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", gap:12 }}>
-                  <div style={{ display:"flex", alignItems:"center", gap:14, flex:1, minWidth:0 }}>
+                <div className="rf-nav-bar-row">
+                  <div className="rf-nav-bar-info">
                     <div style={{ background:"rgba(255,255,255,.15)", borderRadius:10, padding:"6px 12px", textAlign:"center", flexShrink:0 }}>
                       <div style={{ fontSize:11, color:"rgba(255,255,255,.6)", fontWeight:600 }}>STEP</div>
                       <div style={{ fontSize:16, fontWeight:800, color:"white", lineHeight:1 }}>{currentStep+1}<span style={{fontSize:11,opacity:.6}}>/{routeSteps.length}</span></div>
@@ -490,7 +606,7 @@ const RouteFinder = ({ setPage }) => {
                       <div style={{ fontSize:14, fontWeight:600, color:"white", lineHeight:1.4, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{routeSteps[currentStep]?.instruction || "Start navigation"}</div>
                     </div>
                   </div>
-                  <div style={{ display:"flex", gap:8, flexShrink:0 }}>
+                  <div className="rf-nav-bar-actions">
                     <button onClick={() => setShowRouteDetails(!showRouteDetails)}
                       style={{ padding:"7px 12px", background:"rgba(255,255,255,.15)", border:"1px solid rgba(255,255,255,.2)", borderRadius:9, color:"white", fontSize:12, fontWeight:600, cursor:"pointer" }}>
                       {showRouteDetails ? "↑ Hide" : "↓ Steps"}
@@ -509,8 +625,8 @@ const RouteFinder = ({ setPage }) => {
             )}
 
             {/* ── Map ── */}
-            <div className="rf-card" style={{ padding:16 }}>
-              <div className="rf-map-wrapper" style={{ height:460 }}>
+            <div className="rf-card">
+              <div className="rf-map-wrapper">
                 <MapContainer center={mapCenter} zoom={13} style={{ height:"100%", width:"100%" }}>
                   <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
                   <MapUpdater center={selectedRoute?.geometry?.[0]} geometry={selectedRoute?.geometry}/>
@@ -557,7 +673,7 @@ const RouteFinder = ({ setPage }) => {
 
             {/* ── Turn-by-turn panel ── */}
             {showRouteDetails && routeSteps.length > 0 && (
-              <div className="rf-card" style={{ padding:"16px 16px", maxHeight:280, overflowY:"auto" }}>
+              <div className="rf-card" style={{ maxHeight:280, overflowY:"auto" }}>
                 <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:14 }}>
                   <span style={{ fontSize:16 }}>🧭</span>
                   <span style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700, fontSize:15, color:"#0F172A" }}>Turn-by-Turn Directions</span>
@@ -567,7 +683,7 @@ const RouteFinder = ({ setPage }) => {
                     <div style={{ width:26, height:26, borderRadius:"50%", background:index===currentStep?"#2563EB":index<currentStep?"#10B981":"#E2E8F0", color:index<=currentStep?"white":"#64748B", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, flexShrink:0 }}>
                       {index < currentStep ? "✓" : index+1}
                     </div>
-                    <div style={{ flex:1 }}>
+                    <div style={{ flex:1, minWidth:0 }}>
                       <div style={{ fontSize:13, fontWeight:600, color:"#0F172A" }}>{step.instruction}</div>
                       <div style={{ fontSize:11, color:"#94A3B8", marginTop:2 }}>{formatDistance(step.distance)} · {formatDuration(step.duration)}{step.name ? ` · ${step.name}` : ""}</div>
                     </div>
@@ -577,8 +693,8 @@ const RouteFinder = ({ setPage }) => {
             )}
 
             {/* ── Routes List ── */}
-            <div className="rf-card" style={{ padding:"20px" }}>
-              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:18 }}>
+            <div className="rf-card">
+              <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:18, flexWrap:"wrap" }}>
                 <span style={{ fontSize:16 }}>🛣️</span>
                 <span style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:800, fontSize:15, color:"#0F172A" }}>Available Routes</span>
                 {routes.length > 0 && <span style={{ marginLeft:"auto", fontSize:12, color:"#64748B", background:"#F1F5F9", padding:"3px 10px", borderRadius:999 }}>{routes.length} route{routes.length>1?"s":""} found</span>}
@@ -602,7 +718,7 @@ const RouteFinder = ({ setPage }) => {
                     return (
                       <div key={route.id} className={`rf-route-card ${isSelected?"selected":""}`} onClick={() => handleRouteSelect(route)}>
                         {/* Top row */}
-                        <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:10 }}>
+                        <div className="rf-route-header">
                           <div style={{ display:"flex", alignItems:"center", gap:8, flexWrap:"wrap" }}>
                             <span style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:14, fontWeight:800, color:"#0F172A" }}>{route.name}</span>
                             {route.isSafest && (
@@ -623,23 +739,23 @@ const RouteFinder = ({ setPage }) => {
                         </div>
 
                         {/* Stars */}
-                        <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
+                        <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10, flexWrap:"wrap" }}>
                           {renderStars(route.rating || convertScoreToRating(route.safetyScore))}
                           <span style={{ fontSize:11, color:"#94A3B8" }}>Safety rating</span>
                         </div>
 
                         {/* Stats row */}
-                        <div style={{ display:"flex", gap:16, flexWrap:"wrap" }}>
+                        <div className="rf-stats-row">
                           <div style={{ display:"flex", alignItems:"center", gap:5 }}>
-                            <svg viewBox="0 0 16 16" fill="none" stroke="#64748B" strokeWidth="1.6" style={{width:13,height:13}}><path strokeLinecap="round" d="M2 8a6 6 0 1112 0A6 6 0 012 8z"/><path strokeLinecap="round" d="M8 5v3l2 2"/></svg>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#64748B" strokeWidth="1.6" style={{width:13,height:13, flexShrink:0}}><path strokeLinecap="round" d="M2 8a6 6 0 1112 0A6 6 0 012 8z"/><path strokeLinecap="round" d="M8 5v3l2 2"/></svg>
                             <span style={{ fontSize:12, color:"#64748B", fontWeight:600 }}>{formatDuration(route.duration)}</span>
                           </div>
                           <div style={{ display:"flex", alignItems:"center", gap:5 }}>
-                            <svg viewBox="0 0 16 16" fill="none" stroke="#64748B" strokeWidth="1.6" style={{width:13,height:13}}><path strokeLinecap="round" strokeLinejoin="round" d="M2 8h12M10 4l4 4-4 4"/></svg>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#64748B" strokeWidth="1.6" style={{width:13,height:13, flexShrink:0}}><path strokeLinecap="round" strokeLinejoin="round" d="M2 8h12M10 4l4 4-4 4"/></svg>
                             <span style={{ fontSize:12, color:"#64748B", fontWeight:600 }}>{formatDistance(route.distance)}</span>
                           </div>
-                          <div style={{ display:"flex", alignItems:"center", gap:5 }}>
-                            <svg viewBox="0 0 16 16" fill="none" stroke="#64748B" strokeWidth="1.6" style={{width:13,height:13}}><path strokeLinecap="round" d="M8 2a3 3 0 100 6 3 3 0 000-6zm0 8c-3 0-5 1.5-5 2.5V14h10v-1.5c0-1-2-2.5-5-2.5z"/></svg>
+                          <div style={{ display:"flex", alignItems:"center", gap:5, minWidth:0 }}>
+                            <svg viewBox="0 0 16 16" fill="none" stroke="#64748B" strokeWidth="1.6" style={{width:13,height:13, flexShrink:0}}><path strokeLinecap="round" d="M8 2a3 3 0 100 6 3 3 0 000-6zm0 8c-3 0-5 1.5-5 2.5V14h10v-1.5c0-1-2-2.5-5-2.5z"/></svg>
                             <span style={{ fontSize:12, color:"#64748B" }}>{route.description}</span>
                           </div>
                         </div>
@@ -661,15 +777,15 @@ const RouteFinder = ({ setPage }) => {
           </div>
 
           {/* ══ RIGHT SIDEBAR ══ */}
-          <div style={{ width:300, flexShrink:0 }}>
-            <div className="rf-card" style={{ padding:"18px" }}>
+          <div className="rf-sidebar">
+            <div className="rf-card">
               {/* Header */}
-              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14 }}>
-                <div>
+              <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:14, gap:8 }}>
+                <div style={{ minWidth:0 }}>
                   <div style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontSize:15, fontWeight:800, color:"#0F172A" }}>Community Feed</div>
                   <div style={{ fontSize:11, color:"#94A3B8", marginTop:1 }}>Live safety reports nearby</div>
                 </div>
-                <div style={{ background:"linear-gradient(135deg,#EFF6FF,#EEF2FF)", color:"#2563EB", fontSize:13, fontWeight:800, padding:"4px 10px", borderRadius:999, border:"1px solid rgba(37,99,235,.2)", display:"flex", alignItems:"center", gap:5 }}>
+                <div style={{ background:"linear-gradient(135deg,#EFF6FF,#EEF2FF)", color:"#2563EB", fontSize:13, fontWeight:800, padding:"4px 10px", borderRadius:999, border:"1px solid rgba(37,99,235,.2)", display:"flex", alignItems:"center", gap:5, flexShrink:0 }}>
                   <span className="live-dot" style={{ width:6, height:6, borderRadius:"50%", background:"#EF4444", display:"inline-block" }}/>
                   {reportsCount}
                 </div>
@@ -704,7 +820,7 @@ const RouteFinder = ({ setPage }) => {
             </div>
 
             {/* Safety tips card */}
-            <div className="rf-card" style={{ padding:"16px", marginTop:14 }}>
+            <div className="rf-card" style={{ marginTop:14 }}>
               <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:12 }}>
                 <span style={{ fontSize:15 }}>🛡️</span>
                 <span style={{ fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:700, fontSize:13, color:"#0F172A" }}>Safety Reminder</span>
